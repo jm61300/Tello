@@ -17,6 +17,9 @@ tellinho.streamon()
 
 tellinho.takeoff()
 
+tellinho.move_up(80)
+oe = 0
+od = 0
 
 #funcoes utilizadas
 def distance(x1, y1, x0, y0):
@@ -27,7 +30,7 @@ def pisca(v1, d1, v2, d2, img):
 
     olhoDireito = v1 / d1
     olhoEsquerdo = v2 / d2
-
+    print('AAAAAAAAAAAAAA', olhoDireito, olhoEsquerdo)
     if olhoDireito < 0.08 or olhoEsquerdo < 0.08:
         # Piscando os dois olhos
         if olhoDireito < 0.08 and olhoEsquerdo < 0.08 and piscando == False:
@@ -35,31 +38,40 @@ def pisca(v1, d1, v2, d2, img):
             print('PISCOU')
             if(tellinho.get_battery()>50):
               tellinho.flip('b')
+              
             # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     
-        if olhoDireito >= 0.12 and olhoEsquerdo >= 0.12 and piscando == True:
-            piscando = False
-            #img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        # if olhoDireito >= 0.12 and olhoEsquerdo >= 0.12 and piscando == True:
+        #     piscando = False
+        #     #img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         
         # Piscando o olho direito
         if olhoDireito < 0.08 and olhoEsquerdo >= 0.12 and piscando == False:
             piscando = True
             print('Piscou Direito ;)')
-            tellinho.land()
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+            if(tellinho.get_battery()>50):
+              tellinho.flip('l')
+              tellinho.move_right(40)
+            # img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
             
-        elif olhoDireito >= 0.12 and olhoEsquerdo >= 0.12 and piscando == True:
-            piscando = False
+        # elif olhoDireito >= 0.12 and olhoEsquerdo >= 0.12 and piscando == True:
+        #     piscando = False
 
         # Piscando o olho esquerdo
         if olhoEsquerdo < 0.08 and olhoDireito >= 0.12 and piscando == False:
             piscando = True
             print('Piscou Esquerdo ;)')
-            tellinho.land()
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-    
-        elif olhoEsquerdo >= 0.12 and olhoDireito >= 0.12 and piscando == True:
-            piscando = False
+            if(tellinho.get_battery()>50):
+              tellinho.flip('r')
+              tellinho.move_left(40)
+
+            # img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+
+
+    #mudei aqui
+    elif olhoEsquerdo >= 0.4 and olhoDireito >= 0.4 and piscando == False: 
+        tellinho.land()
+
     else:
         piscando = False
         # print('Nao piscou :(')
@@ -72,7 +84,7 @@ def faceTrack(img):
   Xm = round(width/2)
   Ym = round(height/2)
   cv2.circle(img, (Xm, Ym), radius=1, color=(255, 0, 0), thickness=5)
-  cv2.rectangle(img, (Xm-50, Ym+50), (Xm+50, Ym-50), color=(0, 0, 255), thickness=5)
+  cv2.rectangle(img, (Xm-80, Ym+80), (Xm+80, Ym-80), color=(0, 0, 255), thickness=5)
   #acha o centro do rosto
   Xrosto = round((positionsx["243"]+positionsx["463"])/2)
   Yrosto = positionsy["243"]
@@ -81,13 +93,13 @@ def faceTrack(img):
   if Xm-50<=Xrosto<=Xm+50 and Ym-50<=Yrosto<=Ym+50:
     print("Rosto centralizado")
   else:
-    if Ym-Yrosto>50:
+    if Ym-Yrosto>100:
       tellinho.move_up(20)
-    elif Ym-Yrosto<-50:
+    elif Ym-Yrosto<-100:
        tellinho.move_down(20)
-    elif(Xm-Xrosto<50):
+    elif(Xm-Xrosto<-100):
       tellinho.rotate_clockwise(15) 
-    elif (Xm-Xrosto>50):
+    elif (Xm-Xrosto>100):
       tellinho.rotate_counter_clockwise(15)       
 
 
@@ -137,6 +149,7 @@ while (cv2.waitKey(10) != ord(" ")):
         disth1 = distance(positionsx["130"], positionsy["130"], positionsx["243"], positionsy["243"])
         distv2 = distance(positionsx["386"], positionsy["386"], positionsx["374"], positionsy["374"])
         disth2 = distance(positionsx["463"], positionsy["463"], positionsx["359"], positionsy["359"])
+        print("AAAAAA", distv1/disth1, distv2/disth2)
         # pisca(distv1, disth1, distv2, disth2, annotated_image)
         faceTrack(annotated_image)
         # cv2.imshow('Aba', annotated_image)
